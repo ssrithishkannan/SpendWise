@@ -1,0 +1,6 @@
+{
+  "name": "SpendWise",
+  "description": "Smart wealth and expense tracker with automated bank reconciliation, AI financial insights, streak habits, intelligent budget pacing, and multi-device cloud sync.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
