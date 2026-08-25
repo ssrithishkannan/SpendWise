@@ -183,7 +183,7 @@ fun AddTransactionBottomSheet(
 
                     // Preset suggestions for instant testing
                     Text(
-                        text = "Quick Presets:",
+                        text = "Student Quick Presets:",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.outline
                     )
@@ -194,10 +194,12 @@ fun AddTransactionBottomSheet(
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         val presets = listOf(
-                            "$18.40 at Chipotle Mexican Grill",
-                            "$65.00 Shell Gas Station",
-                            "$12.99 Netflix Subscription",
-                            "$110.00 Whole Foods groceries"
+                            "$6.25 Campus Cold Brew via Campus Card",
+                            "$18.50 Roommate Pizza Split on Venmo",
+                            "$42.00 Dorm Groceries at Trader Joe's",
+                            "$68.50 Calculus Textbook Rental",
+                            "$12.40 Uber Ride with Friends",
+                            "$350.00 Work-Study Campus Paycheck"
                         )
                         presets.forEach { preset ->
                             Surface(

@@ -19,8 +19,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.ArrowBack
@@ -34,10 +37,13 @@ import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.RestartAlt
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Verified
@@ -76,6 +82,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -117,7 +124,7 @@ fun UserProfileScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "SpendWise Account & Profile",
+                        text = "SpendWise Student Profile",
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge
                     )
@@ -149,7 +156,7 @@ fun UserProfileScreen(
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
-            // 1. Subtle, Ultra-Modern Hero Identity Card
+            // 1. Hero Identity Card with College Info
             item {
                 Card(
                     modifier = Modifier
@@ -209,15 +216,20 @@ fun UserProfileScreen(
                                             )
                                             Icon(
                                                 imageVector = Icons.Default.Verified,
-                                                contentDescription = "Verified Member",
+                                                contentDescription = "Verified Student",
                                                 tint = PolishTertiaryGreen,
                                                 modifier = Modifier.size(18.dp)
                                             )
                                         }
                                         Text(
-                                            text = currentProfile.userEmail,
+                                            text = "${currentProfile.universityName} • Class of ${currentProfile.graduationYear}",
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = Color.White.copy(alpha = 0.85f)
+                                            color = Color.White.copy(alpha = 0.9f)
+                                        )
+                                        Text(
+                                            text = "${currentProfile.studentMajor} • ${currentProfile.userEmail}",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color.White.copy(alpha = 0.75f)
                                         )
                                     }
                                 }
@@ -229,16 +241,16 @@ fun UserProfileScreen(
                                         .size(38.dp)
                                         .clickable { showEditProfileDialog = true }
                                         .testTag("edit_profile_button")
-                                ) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "Edit Profile",
-                                            tint = Color.White,
-                                            modifier = Modifier.size(18.dp)
-                                        )
+                                    ) {
+                                        Box(contentAlignment = Alignment.Center) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Edit Profile",
+                                                tint = Color.White,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
                                     }
-                                }
                             }
 
                             // Ribbon Statistics
@@ -262,8 +274,8 @@ fun UserProfileScreen(
                                         .background(Color.White.copy(alpha = 0.25f))
                                 )
                                 ProfileMetricItem(
-                                    label = "Savings Pace",
-                                    value = "${(overview.netSavingsRate * 100).toInt()}%"
+                                    label = "Meal Swipes",
+                                    value = "${currentProfile.diningHallSwipesRemaining} Left"
                                 )
                                 Box(
                                     modifier = Modifier
@@ -272,8 +284,8 @@ fun UserProfileScreen(
                                         .background(Color.White.copy(alpha = 0.25f))
                                 )
                                 ProfileMetricItem(
-                                    label = "Level",
-                                    value = "Tier ${streak?.currentLevel ?: 1}"
+                                    label = "Venmo Handle",
+                                    value = currentProfile.venmoHandle.ifBlank { "@student" }
                                 )
                             }
                         }
@@ -281,7 +293,48 @@ fun UserProfileScreen(
                 }
             }
 
-            // 2. Google Account & Cloud Sync Section
+            // 2. Campus & Academic Settings Card
+            item {
+                Text(
+                    text = "Campus Life & Meal Plan",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Card(
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
+                ) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        ProfileSettingRow(
+                            icon = Icons.Default.School,
+                            title = "University & Major",
+                            currentValue = "${currentProfile.universityName} (${currentProfile.studentMajor})",
+                            onClick = { showEditProfileDialog = true },
+                            testTag = "profile_university_row"
+                        )
+                        ProfileSettingRow(
+                            icon = Icons.Default.Restaurant,
+                            title = "Dining Meal Plan",
+                            currentValue = "${currentProfile.diningMealPlan} (${currentProfile.diningHallSwipesRemaining} Swipes, $${String.format(Locale.US, "%.2f", currentProfile.flexDiningDollarsRemaining)} Flex)",
+                            onClick = { showEditProfileDialog = true },
+                            testTag = "profile_meal_plan_row"
+                        )
+                        ProfileSettingRow(
+                            icon = Icons.Default.Group,
+                            title = "Housing & Venmo",
+                            currentValue = "${currentProfile.campusHousing} • Venmo: ${currentProfile.venmoHandle}",
+                            onClick = { showEditProfileDialog = true },
+                            testTag = "profile_housing_venmo_row"
+                        )
+                    }
+                }
+            }
+
+            // 3. Google Account & Cloud Sync Section
             item {
                 Text(
                     text = "Cloud Backup & Storage",
@@ -385,83 +438,6 @@ fun UserProfileScreen(
                 }
             }
 
-            // 3. Financial Institutions & Banking
-            item {
-                Text(
-                    text = "Connected Banking Feeds",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Card(
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(18.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        bankAccounts.forEach { account ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                                ) {
-                                    Surface(
-                                        shape = CircleShape,
-                                        color = MaterialTheme.colorScheme.surfaceVariant,
-                                        modifier = Modifier.size(36.dp)
-                                    ) {
-                                        Box(contentAlignment = Alignment.Center) {
-                                            Icon(
-                                                imageVector = Icons.Default.AccountBalance,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.onSurface,
-                                                modifier = Modifier.size(18.dp)
-                                            )
-                                        }
-                                    }
-                                    Column {
-                                        Text(
-                                            text = account.institutionName,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 13.sp
-                                        )
-                                        Text(
-                                            text = "${account.accountType} • ${account.accountNumberMask}",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                }
-
-                                Surface(
-                                    shape = RoundedCornerShape(8.dp),
-                                    color = PolishGreenSuccess.copy(alpha = 0.15f)
-                                ) {
-                                    Text(
-                                        text = "LIVE",
-                                        fontSize = 10.sp,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        color = PolishGreenSuccess,
-                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             // 4. Regional & Locale Preferences (Language & Currency)
             item {
                 Text(
@@ -554,17 +530,17 @@ fun UserProfileScreen(
                     Column(modifier = Modifier.fillMaxWidth()) {
                         ProfileSettingRow(
                             icon = Icons.Default.RestartAlt,
-                            title = "Re-run Starting Setup Wizard",
-                            currentValue = "Configure banks, currency & goals",
+                            title = "Re-run Student Setup Wizard",
+                            currentValue = "Configure university, meal plan & semester goals",
                             onClick = onReRunSetup,
                             testTag = "profile_rerun_setup_row"
                         )
                         ProfileSettingRow(
                             icon = Icons.Default.Download,
-                            title = "Export Financial Statement (CSV)",
+                            title = "Export Student Financial Statement (CSV)",
                             currentValue = "Download all transactions",
                             onClick = {
-                                Toast.makeText(context, "Exporting statement to Downloads/Aura_Statement.csv", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Exporting statement to Downloads/SpendWise_Statement.csv", Toast.LENGTH_SHORT).show()
                             },
                             testTag = "profile_export_csv_row"
                         )
@@ -579,7 +555,7 @@ fun UserProfileScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Aura Finance • Version 2.4.0",
+                        text = "SpendWise • Version 2.5.0 (Student Edition)",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
@@ -595,17 +571,30 @@ fun UserProfileScreen(
 
     // --- Dialogs ---
 
-    // 1. Edit Profile Dialog
+    // 1. Edit Profile Dialog with College fields
     if (showEditProfileDialog) {
         var editName by remember { mutableStateOf(currentProfile.userName) }
         var editEmail by remember { mutableStateOf(currentProfile.userEmail) }
+        var editUniversity by remember { mutableStateOf(currentProfile.universityName) }
+        var editMajor by remember { mutableStateOf(currentProfile.studentMajor) }
+        var editGradYear by remember { mutableStateOf(currentProfile.graduationYear) }
+        var editHousing by remember { mutableStateOf(currentProfile.campusHousing) }
+        var editMealPlan by remember { mutableStateOf(currentProfile.diningMealPlan) }
+        var editVenmo by remember { mutableStateOf(currentProfile.venmoHandle) }
+        var editSwipes by remember { mutableStateOf(currentProfile.diningHallSwipesRemaining.toString()) }
+        var editFlex by remember { mutableStateOf(String.format(Locale.US, "%.2f", currentProfile.flexDiningDollarsRemaining)) }
         var editAvatarIndex by remember { mutableIntStateOf(currentProfile.avatarIndex) }
 
         AlertDialog(
             onDismissRequest = { showEditProfileDialog = false },
-            title = { Text("Edit Aura Profile", fontWeight = FontWeight.Bold) },
+            title = { Text("Edit Student Profile", fontWeight = FontWeight.Bold) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
                     Text("Avatar Color", style = MaterialTheme.typography.bodySmall)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -648,10 +637,80 @@ fun UserProfileScreen(
                     OutlinedTextField(
                         value = editEmail,
                         onValueChange = { editEmail = it },
-                        label = { Text("Google Account Email") },
+                        label = { Text("Student .edu Email") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
+
+                    OutlinedTextField(
+                        value = editUniversity,
+                        onValueChange = { editUniversity = it },
+                        label = { Text("University / College") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = editMajor,
+                            onValueChange = { editMajor = it },
+                            label = { Text("Major") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1.2f)
+                        )
+                        OutlinedTextField(
+                            value = editGradYear,
+                            onValueChange = { editGradYear = it },
+                            label = { Text("Grad Year") },
+                            singleLine = true,
+                            modifier = Modifier.weight(0.8f)
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = editHousing,
+                            onValueChange = { editHousing = it },
+                            label = { Text("Housing") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                        OutlinedTextField(
+                            value = editVenmo,
+                            onValueChange = { editVenmo = it },
+                            label = { Text("Venmo Handle") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = editSwipes,
+                            onValueChange = { editSwipes = it },
+                            label = { Text("Meal Swipes") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            singleLine = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                        OutlinedTextField(
+                            value = editFlex,
+                            onValueChange = { editFlex = it },
+                            label = { Text("Flex Dollars ($)") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            singleLine = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
             },
             confirmButton = {
@@ -660,7 +719,14 @@ fun UserProfileScreen(
                         viewModel.updateUserProfile(
                             currentProfile.copy(
                                 userName = editName.ifBlank { "Jordan Walker" },
-                                userEmail = editEmail.ifBlank { "jordan.aura@gmail.com" },
+                                userEmail = editEmail.ifBlank { "jordan.walker@campus.edu" },
+                                universityName = editUniversity.ifBlank { "State University" },
+                                studentMajor = editMajor.ifBlank { "Computer Science" },
+                                graduationYear = editGradYear.ifBlank { "2027" },
+                                campusHousing = editHousing.ifBlank { "Campus Dorm" },
+                                venmoHandle = editVenmo.ifBlank { "@jordan-spendwise" },
+                                diningHallSwipesRemaining = editSwipes.toIntOrNull() ?: 94,
+                                flexDiningDollarsRemaining = editFlex.toDoubleOrNull() ?: 142.50,
                                 avatarIndex = editAvatarIndex
                             )
                         )

@@ -325,7 +325,7 @@ fun BudgetsScreen(
         }
 
         // 5. Category Budget Items
-        items(TransactionCategory.values().filter { it != TransactionCategory.SALARY }) { cat ->
+        items(TransactionCategory.entries.filter { it != TransactionCategory.STUDENT_AID_ALLOWANCE && it != TransactionCategory.CAMPUS_JOB_SALARY }) { cat ->
             val catBudget = budgets.find { it.category == cat.name }
             val limit = catBudget?.monthlyLimit ?: cat.defaultMonthlyBudget
             val spent = currentMonthExpenses.filter { it.category == cat }.sumOf { it.amount }

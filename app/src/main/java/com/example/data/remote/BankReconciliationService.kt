@@ -96,7 +96,7 @@ class BankReconciliationService {
                 amount = 45.99,
                 date = dateFormat.format(Date(now - (oneDay * 3))),
                 timestamp = now - (oneDay * 3),
-                suggestedCategory = TransactionCategory.SHOPPING,
+                suggestedCategory = TransactionCategory.CAMPUS_SUPPLIES,
                 isMatchedWithLocal = false,
                 status = BankMatchStatus.PENDING
             ),
@@ -107,7 +107,7 @@ class BankReconciliationService {
                 amount = 112.40,
                 date = dateFormat.format(Date(now - (oneDay * 4))),
                 timestamp = now - (oneDay * 4),
-                suggestedCategory = TransactionCategory.UTILITIES,
+                suggestedCategory = TransactionCategory.HOUSING_DORM,
                 isMatchedWithLocal = false,
                 status = BankMatchStatus.PENDING
             )

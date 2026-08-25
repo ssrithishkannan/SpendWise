@@ -220,10 +220,10 @@ class GeminiFinancialService {
             lower.contains("coffee") || lower.contains("lunch") || lower.contains("dinner") || lower.contains("burger") || lower.contains("pizza") || lower.contains("restaurant") || lower.contains("food") -> TransactionCategory.FOOD_DINING
             lower.contains("grocer") || lower.contains("market") || lower.contains("walmart") || lower.contains("trader") || lower.contains("costco") -> TransactionCategory.GROCERIES
             lower.contains("uber") || lower.contains("lyft") || lower.contains("gas") || lower.contains("fuel") || lower.contains("subway") || lower.contains("metro") || lower.contains("flight") -> TransactionCategory.TRANSPORT
-            lower.contains("rent") || lower.contains("electric") || lower.contains("water") || lower.contains("wifi") || lower.contains("utility") -> TransactionCategory.HOUSING_BILLS
+            lower.contains("rent") || lower.contains("electric") || lower.contains("water") || lower.contains("wifi") || lower.contains("utility") -> TransactionCategory.HOUSING_DORM
             lower.contains("movie") || lower.contains("cinema") || lower.contains("netflix") || lower.contains("spotify") || lower.contains("game") -> TransactionCategory.ENTERTAINMENT
             lower.contains("gym") || lower.contains("doctor") || lower.contains("pharmacy") || lower.contains("medicine") -> TransactionCategory.HEALTH
-            lower.contains("cloth") || lower.contains("amazon") || lower.contains("shoes") || lower.contains("shopping") -> TransactionCategory.SHOPPING
+            lower.contains("cloth") || lower.contains("amazon") || lower.contains("shoes") || lower.contains("shopping") -> TransactionCategory.CAMPUS_SUPPLIES
             lower.contains("stock") || lower.contains("crypto") || lower.contains("deposit") || lower.contains("etf") -> TransactionCategory.INVESTMENTS
             else -> TransactionCategory.OTHER
         }

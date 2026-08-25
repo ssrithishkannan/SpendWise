@@ -30,10 +30,12 @@ import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.CloudSync
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Savings
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -60,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.data.local.TransactionEntity
+import com.example.data.local.UserProfileEntity
 import com.example.data.model.TransactionCategory
 import com.example.data.model.TransactionType
 import com.example.ui.components.BudgetPaceGauge
@@ -77,6 +80,7 @@ import com.example.ui.theme.PolishStreakRed
 import com.example.ui.theme.PolishTertiaryGreen
 import com.example.ui.viewmodel.FinancialViewModel
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -116,13 +120,24 @@ fun DashboardScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    Text(
-                        text = "WELCOME BACK",
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 1.2.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.School,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = (profile?.universityName ?: "CAMPUS LIFE").uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 1.2.sp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                     Text(
                         text = "Hey, $firstName",
                         style = MaterialTheme.typography.headlineMedium,
@@ -209,20 +224,31 @@ fun DashboardScreen(
             )
         }
 
-        // 3. Quick Action Buttons
+        // 3. College Student Daily Safe-to-Spend & Meal Swipes Card
+        item {
+            CollegeSafeSpendAndMealPlanCard(
+                profile = profile,
+                monthlySpent = overview.monthlyExpense,
+                monthlyLimit = overview.monthlyBudgetLimit,
+                onUseMealSwipe = { viewModel.useMealSwipe() },
+                onSplitBillClick = onNavigateToReconciliation
+            )
+        }
+
+        // 4. Quick Action Buttons
         item {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 // Add Expense Button
                 Surface(
                     onClick = onOpenAddTransaction,
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(18.dp),
                     color = PolishSecondary,
                     modifier = Modifier
                         .weight(1f)
-                        .height(72.dp)
+                        .height(68.dp)
                         .testTag("action_add_expense")
                 ) {
                     Column(
@@ -234,9 +260,9 @@ fun DashboardScreen(
                             imageVector = Icons.Default.Payments,
                             contentDescription = null,
                             tint = Color(0xFF1D192B),
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(22.dp)
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(3.dp))
                         Text(
                             text = "ADD EXPENSE",
                             style = MaterialTheme.typography.labelSmall,
@@ -248,14 +274,47 @@ fun DashboardScreen(
                     }
                 }
 
+                // Split Bill (Venmo) Button
+                Surface(
+                    onClick = onNavigateToReconciliation,
+                    shape = RoundedCornerShape(18.dp),
+                    color = Color(0xFFE8DEF8),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(68.dp)
+                        .testTag("action_split_roommate_bill")
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Group,
+                            contentDescription = null,
+                            tint = Color(0xFF381E72),
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Spacer(modifier = Modifier.height(3.dp))
+                        Text(
+                            text = "SPLIT BILL",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.ExtraBold,
+                            letterSpacing = 0.5.sp,
+                            color = Color(0xFF381E72),
+                            fontSize = 11.sp
+                        )
+                    }
+                }
+
                 // Bank Sync / Wallet Button
                 Surface(
                     onClick = onNavigateToReconciliation,
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(18.dp),
                     color = PolishPrimaryLight,
                     modifier = Modifier
                         .weight(1f)
-                        .height(72.dp)
+                        .height(68.dp)
                         .testTag("action_wallet_sync")
                 ) {
                     Column(
@@ -267,9 +326,9 @@ fun DashboardScreen(
                             imageVector = Icons.Default.AccountBalanceWallet,
                             contentDescription = null,
                             tint = Color(0xFF001D35),
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(22.dp)
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(3.dp))
                         Text(
                             text = "WALLET & SYNC",
                             style = MaterialTheme.typography.labelSmall,
@@ -703,3 +762,232 @@ fun TransactionRowCard(
         }
     }
 }
+
+@Composable
+fun CollegeSafeSpendAndMealPlanCard(
+    profile: UserProfileEntity?,
+    monthlySpent: Double,
+    monthlyLimit: Double,
+    onUseMealSwipe: () -> Unit,
+    onSplitBillClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val cal = Calendar.getInstance()
+    val daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+    val currentDay = cal.get(Calendar.DAY_OF_MONTH)
+    val daysRemaining = (daysInMonth - currentDay + 1).coerceAtLeast(1)
+    val budgetRemaining = (monthlyLimit - monthlySpent).coerceAtLeast(0.0)
+    val safeDailySpend = budgetRemaining / daysRemaining
+
+    val spentRatio = if (monthlyLimit > 0) (monthlySpent / monthlyLimit).toFloat() else 0f
+    val (statusLabel, statusColor, statusEmoji) = when {
+        spentRatio < 0.65f -> Triple("Healthy Pace", Color(0xFF10B981), "🟢")
+        spentRatio < 0.90f -> Triple("Thrifty Mode", Color(0xFFF59E0B), "🟡")
+        else -> Triple("Ramen Mode Alert", Color(0xFFEF4444), "🍜")
+    }
+
+    val swipesRemaining = profile?.diningHallSwipesRemaining ?: 94
+    val flexDollars = profile?.flexDiningDollarsRemaining ?: 142.50
+    val dormLocation = profile?.campusHousing ?: "Campus Dorm"
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .testTag("college_safe_spend_card"),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            // Header with Broke-o-meter badge
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.School,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column {
+                        Text(
+                            text = "Campus Burn Rate",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "$dormLocation • $daysRemaining days left in month",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                Surface(
+                    shape = RoundedCornerShape(50),
+                    color = statusColor.copy(alpha = 0.12f),
+                    border = BorderStroke(1.dp, statusColor.copy(alpha = 0.4f))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = statusEmoji,
+                            fontSize = 11.sp
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = statusLabel,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = statusColor
+                        )
+                    }
+                }
+            }
+
+            // Daily Safe-To-Spend Big Value
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
+                    .padding(14.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "SAFE DAILY SPEND",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        letterSpacing = 0.5.sp
+                    )
+                    Text(
+                        text = "$${String.format(Locale.US, "%.2f", safeDailySpend)}/day",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = "MONTHLY LEFTOVER",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        letterSpacing = 0.5.sp
+                    )
+                    Text(
+                        text = "$${String.format(Locale.US, "%.2f", budgetRemaining)}",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = if (budgetRemaining > 0) Color(0xFF10B981) else Color(0xFFEF4444)
+                    )
+                }
+            }
+
+            // Dining Swipes & Flex Points Tracker
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                // Dining Swipes Pill
+                Surface(
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(14.dp),
+                    color = Color(0xFFFFECE8),
+                    border = BorderStroke(1.dp, Color(0xFFFFD4CA))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
+                            Text(
+                                text = "MEAL SWIPES",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFC83A22),
+                                fontSize = 9.sp
+                            )
+                            Text(
+                                text = "$swipesRemaining left",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color(0xFF9E2310)
+                            )
+                        }
+                        Surface(
+                            onClick = onUseMealSwipe,
+                            shape = RoundedCornerShape(8.dp),
+                            color = Color(0xFFC83A22)
+                        ) {
+                            Text(
+                                text = "-1",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+                }
+
+                // Flex Dollars Pill
+                Surface(
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(14.dp),
+                    color = Color(0xFFE6F4EA),
+                    border = BorderStroke(1.dp, Color(0xFFCEEAD6))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                    ) {
+                        Text(
+                            text = "FLEX DINING $",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF137333),
+                            fontSize = 9.sp
+                        )
+                        Text(
+                            text = "$${String.format(Locale.US, "%.2f", flexDollars)}",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color(0xFF0D5224)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+

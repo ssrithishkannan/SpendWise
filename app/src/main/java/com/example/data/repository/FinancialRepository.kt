@@ -216,8 +216,8 @@ class FinancialRepository(
         return listOf(
             BadgeItem(
                 id = "first_entry",
-                title = "Seed of Wealth",
-                description = "Logged your very first transaction in FinPulse.",
+                title = "College Fin Ignition",
+                description = "Logged your very first transaction in SpendWise.",
                 tier = BadgeTier.BRONZE,
                 xpReward = 100,
                 progress = if (transactions.isNotEmpty()) 1.0f else 0.0f,
@@ -226,8 +226,8 @@ class FinancialRepository(
             ),
             BadgeItem(
                 id = "streak_3_days",
-                title = "3-Day Ignition",
-                description = "Build the habit: Track your expenses 3 days in a row.",
+                title = "Dorm Discipline",
+                description = "Build the habit: Track your daily spending 3 days in a row.",
                 tier = BadgeTier.BRONZE,
                 xpReward = 150,
                 progress = (streakCount / 3.0f).coerceIn(0.0f, 1.0f),
@@ -236,8 +236,8 @@ class FinancialRepository(
             ),
             BadgeItem(
                 id = "streak_7_days",
-                title = "Discipline Master",
-                description = "Maintain a stellar 7-day expense tracking streak.",
+                title = "Midterms Master",
+                description = "Maintain a stellar 7-day college expense tracking streak.",
                 tier = BadgeTier.SILVER,
                 xpReward = 300,
                 progress = (streakCount / 7.0f).coerceIn(0.0f, 1.0f),
@@ -246,27 +246,27 @@ class FinancialRepository(
             ),
             BadgeItem(
                 id = "streak_30_days",
-                title = "Zen Money Sensei",
-                description = "Master financial mindfulness with a 30-day streak.",
+                title = "Semester Money Sensei",
+                description = "Master financial mindfulness with a 30-day streak all semester long.",
                 tier = BadgeTier.DIAMOND,
                 xpReward = 1000,
                 progress = (streakCount / 30.0f).coerceIn(0.0f, 1.0f),
                 isUnlocked = streakCount >= 30
             ),
             BadgeItem(
-                id = "reconciliation_ace",
-                title = "Reconciliation Ace",
-                description = "Match and reconcile at least 5 transactions with bank feeds.",
+                id = "roommate_ace",
+                title = "Roommate Split Ace",
+                description = "Split and reconcile shared dorm bills & pizza runs with zero friction.",
                 tier = BadgeTier.SILVER,
                 xpReward = 250,
-                progress = (reconciledCount / 5.0f).coerceIn(0.0f, 1.0f),
-                isUnlocked = reconciledCount >= 5,
-                unlockedDate = if (reconciledCount >= 5) "Mastered" else null
+                progress = (reconciledCount / 3.0f).coerceIn(0.0f, 1.0f),
+                isUnlocked = reconciledCount >= 3,
+                unlockedDate = if (reconciledCount >= 3) "Mastered" else null
             ),
             BadgeItem(
                 id = "budget_guardian",
-                title = "Budget Guardian",
-                description = "Stay under your monthly budget limit with total peace of mind.",
+                title = "Campus Budget Guardian",
+                description = "Stay under your monthly college allowance & burn rate limit.",
                 tier = BadgeTier.GOLD,
                 xpReward = 500,
                 progress = if (totalBudget > 0 && totalExpenses <= totalBudget) 1.0f else 0.7f,
@@ -275,8 +275,8 @@ class FinancialRepository(
             ),
             BadgeItem(
                 id = "cloud_architect",
-                title = "Cloud Explorer",
-                description = "Connect 3 live bank feeds with encrypted real-time sync.",
+                title = "Campus Cloud Sync",
+                description = "Encrypted multi-device backup active with real-time sync.",
                 tier = BadgeTier.GOLD,
                 xpReward = 400,
                 progress = 1.0f,
@@ -292,124 +292,124 @@ class FinancialRepository(
             val now = System.currentTimeMillis()
             val oneDay = 86400000L
 
-            // 1. Initial Sample Transactions
+            // 1. Initial College Sample Transactions
             val sampleTransactions = listOf(
                 TransactionEntity(
-                    title = "Monthly Software Engineering Salary",
-                    amount = 4500.00,
+                    title = "Fall Financial Aid & Scholarship Refund",
+                    amount = 2200.00,
                     type = TransactionType.INCOME,
-                    category = TransactionCategory.SALARY,
+                    category = TransactionCategory.STUDENT_AID_ALLOWANCE,
                     paymentMethod = PaymentMethod.BANK_TRANSFER,
                     timestamp = now - (oneDay * 20),
-                    note = "Direct Deposit Employer Inc.",
+                    note = "University Direct Deposit Financial Aid Office",
                     isReconciled = true,
                     isCloudSynced = true
                 ),
                 TransactionEntity(
-                    title = "Whole Foods Organic Market",
-                    amount = 84.50,
+                    title = "Campus Work-Study Library Paycheck",
+                    amount = 340.00,
+                    type = TransactionType.INCOME,
+                    category = TransactionCategory.CAMPUS_JOB_SALARY,
+                    paymentMethod = PaymentMethod.BANK_TRANSFER,
+                    timestamp = now - (oneDay * 6),
+                    note = "Bi-weekly 20 hrs student desk assistant",
+                    isReconciled = true,
+                    isCloudSynced = true
+                ),
+                TransactionEntity(
+                    title = "Campus Bookstore - Algorithms Textbook & Notebooks",
+                    amount = 68.50,
                     type = TransactionType.EXPENSE,
-                    category = TransactionCategory.GROCERIES,
-                    paymentMethod = PaymentMethod.CREDIT_CARD,
-                    timestamp = now - (oneDay * 1),
-                    note = "Produce, berries & sourdough",
+                    category = TransactionCategory.TEXTBOOKS_TUITION,
+                    paymentMethod = PaymentMethod.DEBIT_CARD,
+                    timestamp = now - (oneDay * 12),
+                    note = "Rented used textbook + lab manual",
                     isReconciled = true,
                     bankTransactionRef = "bank_tx_101",
                     isCloudSynced = true
                 ),
                 TransactionEntity(
-                    title = "Uber Comfort to Airport",
-                    amount = 38.20,
+                    title = "Dorm Late-Night Pizza Run (Split w/ Roommates)",
+                    amount = 18.75,
                     type = TransactionType.EXPENSE,
-                    category = TransactionCategory.TRANSPORT,
-                    paymentMethod = PaymentMethod.CREDIT_CARD,
-                    timestamp = now - (oneDay * 2),
-                    note = "Flight commute",
+                    category = TransactionCategory.FOOD_DINING,
+                    paymentMethod = PaymentMethod.VENMO,
+                    timestamp = now - (oneDay * 1),
+                    note = "My share of large pizza & drinks with Sam & Alex",
                     isReconciled = true,
                     bankTransactionRef = "bank_tx_102",
                     isCloudSynced = true
                 ),
                 TransactionEntity(
-                    title = "Apartment Rent & Service Fee",
-                    amount = 1250.00,
+                    title = "Maple Hall Dorm Rent & Utilities",
+                    amount = 550.00,
                     type = TransactionType.EXPENSE,
-                    category = TransactionCategory.HOUSING_BILLS,
+                    category = TransactionCategory.HOUSING_DORM,
                     paymentMethod = PaymentMethod.BANK_TRANSFER,
                     timestamp = now - (oneDay * 22),
-                    note = "Monthly lease payment",
+                    note = "Monthly student housing fee",
                     isReconciled = true,
                     isCloudSynced = true
                 ),
                 TransactionEntity(
-                    title = "Blue Bottle Artisanal Coffee",
-                    amount = 6.75,
+                    title = "Campus Coffee Cart - Double Cold Brew & Bagel",
+                    amount = 6.25,
                     type = TransactionType.EXPENSE,
-                    category = TransactionCategory.FOOD_DINING,
-                    paymentMethod = PaymentMethod.DEBIT_CARD,
-                    timestamp = now - (3600000L * 4), // 4 hours ago
-                    note = "Morning espresso & pastry",
+                    category = TransactionCategory.COFFEE_ENERGY,
+                    paymentMethod = PaymentMethod.CAMPUS_CARD,
+                    timestamp = now - (3600000L * 3), // 3 hours ago
+                    note = "Morning fuel for 9 AM Physics lecture",
                     isReconciled = false,
                     isCloudSynced = true
                 ),
                 TransactionEntity(
-                    title = "S&P 500 Index ETF Auto-Invest",
-                    amount = 500.00,
+                    title = "Trader Joe's Dorm Snacks & Oat Milk",
+                    amount = 42.10,
                     type = TransactionType.EXPENSE,
-                    category = TransactionCategory.INVESTMENTS,
-                    paymentMethod = PaymentMethod.BANK_TRANSFER,
-                    timestamp = now - (oneDay * 15),
-                    note = "Dollar-cost averaging into Vanguard VOO",
-                    isReconciled = true,
-                    isCloudSynced = true
-                ),
-                TransactionEntity(
-                    title = "Dinner with Friends at Izakaya",
-                    amount = 68.40,
-                    type = TransactionType.EXPENSE,
-                    category = TransactionCategory.FOOD_DINING,
-                    paymentMethod = PaymentMethod.CREDIT_CARD,
+                    category = TransactionCategory.GROCERIES,
+                    paymentMethod = PaymentMethod.APPLE_PAY,
                     timestamp = now - (oneDay * 3),
-                    note = "Ramen & appetizers",
+                    note = "Microwave ramen, apples, Greek yogurt, peanut butter",
                     isReconciled = true,
                     isCloudSynced = true
                 ),
                 TransactionEntity(
-                    title = "Climbing Gym Monthly Pass",
-                    amount = 89.00,
+                    title = "Spotify & Hulu Student Bundle",
+                    amount = 5.99,
                     type = TransactionType.EXPENSE,
-                    category = TransactionCategory.HEALTH,
+                    category = TransactionCategory.SUBSCRIPTIONS_TECH,
                     paymentMethod = PaymentMethod.CREDIT_CARD,
-                    timestamp = now - (oneDay * 12),
-                    note = "Bouldering membership",
+                    timestamp = now - (oneDay * 10),
+                    note = "Monthly verified .edu subscription",
                     isReconciled = true,
                     isCloudSynced = true
                 ),
                 TransactionEntity(
-                    title = "Cinema IMAX Tickets & Popcorn",
-                    amount = 34.00,
+                    title = "Late Night Uber Share to Campus",
+                    amount = 12.40,
                     type = TransactionType.EXPENSE,
-                    category = TransactionCategory.ENTERTAINMENT,
-                    paymentMethod = PaymentMethod.CREDIT_CARD,
-                    timestamp = now - (oneDay * 5),
-                    note = "Weekend sci-fi premiere",
+                    category = TransactionCategory.TRANSPORT,
+                    paymentMethod = PaymentMethod.VENMO,
+                    timestamp = now - (oneDay * 4),
+                    note = "Split rideshare after study group at library",
                     isReconciled = false,
                     isCloudSynced = true
                 ),
                 TransactionEntity(
-                    title = "Freelance Consulting Gig",
-                    amount = 650.00,
-                    type = TransactionType.INCOME,
-                    category = TransactionCategory.SALARY,
-                    paymentMethod = PaymentMethod.BANK_TRANSFER,
-                    timestamp = now - (oneDay * 8),
-                    note = "Mobile UI architectural audit",
+                    title = "Campus Print Station - Engineering Lab Reports",
+                    amount = 8.50,
+                    type = TransactionType.EXPENSE,
+                    category = TransactionCategory.CAMPUS_SUPPLIES,
+                    paymentMethod = PaymentMethod.CAMPUS_CARD,
+                    timestamp = now - (oneDay * 7),
+                    note = "Color poster print & binding",
                     isReconciled = true,
                     isCloudSynced = true
                 )
             )
             dao.insertTransactions(sampleTransactions)
 
-            // 2. Default Budgets
+            // 2. Default College Budgets
             val defaultBudgets = TransactionCategory.values().map { cat ->
                 CategoryBudgetEntity(
                     category = cat.name,
@@ -420,7 +420,7 @@ class FinancialRepository(
             }
             dao.insertBudgets(defaultBudgets)
 
-            // 3. Initial Habit Streak (5 days active streak for great onboarding feel)
+            // 3. Initial Habit Streak (5 days active streak)
             val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
             val initialStreak = StreakEntity(
                 id = 1,
@@ -437,39 +437,39 @@ class FinancialRepository(
             // 4. Initial Bank Accounts
             val bankAccounts = listOf(
                 BankSyncAccountEntity(
-                    accountId = "chase_sapphire",
-                    institutionName = "Chase Sapphire",
-                    accountNumberMask = "•••• 8921",
-                    accountType = "Credit Card",
-                    balance = -1842.30,
-                    lastSyncedTimestamp = now - 1800000L,
-                    isAutoSyncActive = true,
-                    pendingDiscrepanciesCount = 2
-                ),
-                BankSyncAccountEntity(
-                    accountId = "wells_fargo_checking",
-                    institutionName = "Wells Fargo",
-                    accountNumberMask = "•••• 3491",
-                    accountType = "Checking Account",
-                    balance = 5620.40,
+                    accountId = "campus_checking",
+                    institutionName = "Campus Credit Union Checking",
+                    accountNumberMask = "•••• 4219",
+                    accountType = "Checking / Financial Aid",
+                    balance = 1845.50,
                     lastSyncedTimestamp = now - 900000L,
                     isAutoSyncActive = true,
-                    pendingDiscrepanciesCount = 0
+                    pendingDiscrepanciesCount = 1
                 ),
                 BankSyncAccountEntity(
-                    accountId = "apple_card_wallet",
-                    institutionName = "Apple Card",
-                    accountNumberMask = "•••• 6012",
-                    accountType = "Digital Wallet / Titanium",
-                    balance = -312.80,
-                    lastSyncedTimestamp = now - 3600000L,
+                    accountId = "student_credit_card",
+                    institutionName = "Chase Freedom Student",
+                    accountNumberMask = "•••• 8921",
+                    accountType = "Student Credit Card (1.5% Cash Back)",
+                    balance = -214.30,
+                    lastSyncedTimestamp = now - 1800000L,
                     isAutoSyncActive = true,
                     pendingDiscrepanciesCount = 1
+                ),
+                BankSyncAccountEntity(
+                    accountId = "campus_card_points",
+                    institutionName = "University Dining Dollars & Flex",
+                    accountNumberMask = "ID: 2027-9941",
+                    accountType = "Meal Plan & Swipes",
+                    balance = 142.50,
+                    lastSyncedTimestamp = now - 3600000L,
+                    isAutoSyncActive = true,
+                    pendingDiscrepanciesCount = 0
                 )
             )
             dao.insertBankAccounts(bankAccounts)
 
-            // 5. Initial User Profile
+            // 5. Initial User Profile for College Student
             val existingProfile = dao.getUserProfileSync()
             if (existingProfile == null) {
                 dao.insertOrUpdateUserProfile(
@@ -477,7 +477,7 @@ class FinancialRepository(
                         id = 1,
                         isOnboardingCompleted = false,
                         userName = "Jordan Walker",
-                        userEmail = "jordan.aura@gmail.com",
+                        userEmail = "jordan.spendwise@gmail.com",
                         avatarIndex = 0,
                         selectedLanguage = "English",
                         selectedCurrencySymbol = "$",
@@ -485,39 +485,103 @@ class FinancialRepository(
                         isGoogleCloudSyncActive = true,
                         isAutoExpenseCalculationActive = true,
                         isBankSyncActive = true,
-                        primaryLinkedBank = "Chase Sapphire",
-                        monthlyBudgetLimit = 2500.0,
-                        targetSavingsRatePercent = 30,
+                        primaryLinkedBank = "Campus Credit Union",
+                        monthlyBudgetLimit = 1200.0,
+                        targetSavingsRatePercent = 20,
                         spendingAlertsEnabled = true,
-                        weeklyReportEnabled = true
-                    )
-                )
-            }
-        } else {
-            // Check if profile exists even if transactions exist
-            val existingProfile = dao.getUserProfileSync()
-            if (existingProfile == null) {
-                dao.insertOrUpdateUserProfile(
-                    UserProfileEntity(
-                        id = 1,
-                        isOnboardingCompleted = true,
-                        userName = "Jordan Walker",
-                        userEmail = "jordan.aura@gmail.com",
-                        avatarIndex = 0,
-                        selectedLanguage = "English",
-                        selectedCurrencySymbol = "$",
-                        selectedCurrencyCode = "USD",
-                        isGoogleCloudSyncActive = true,
-                        isAutoExpenseCalculationActive = true,
-                        isBankSyncActive = true,
-                        primaryLinkedBank = "Chase Sapphire",
-                        monthlyBudgetLimit = 2500.0,
-                        targetSavingsRatePercent = 30,
-                        spendingAlertsEnabled = true,
-                        weeklyReportEnabled = true
+                        weeklyReportEnabled = true,
+                        universityName = "State University",
+                        studentMajor = "Computer Science",
+                        graduationYear = "Class of '27",
+                        semesterTerm = "Fall 2026",
+                        campusHousing = "Campus Dorm (Maple Hall)",
+                        diningMealPlan = "14 Meals/Wk + $200 Points",
+                        semesterBudgetLimit = 4500.0,
+                        semesterWeeksTotal = 16,
+                        semesterWeeksElapsed = 5,
+                        diningHallSwipesRemaining = 94,
+                        flexDiningDollarsRemaining = 142.50,
+                        venmoHandle = "@jordan-spendwise",
+                        isCollegeModeActive = true
                     )
                 )
             }
         }
     }
+
+    fun getStudentPerks(): List<com.example.data.model.StudentPerk> {
+        return listOf(
+            com.example.data.model.StudentPerk(
+                id = "spotify_student",
+                company = "Spotify + Hulu",
+                title = "Spotify Premium Student with Hulu",
+                discountSummary = "$5.99/mo (Normally $11.99)",
+                category = "Music & Video",
+                verifiedMethod = "SheerID / .edu Email",
+                savingsEstimate = "Save $132/year",
+                urlHint = "spotify.com/student"
+            ),
+            com.example.data.model.StudentPerk(
+                id = "prime_student",
+                company = "Amazon Prime",
+                title = "Prime Student 6-Month Free Trial",
+                discountSummary = "Free for 6 Months, then 50% Off",
+                category = "Shopping & Fast Shipping",
+                verifiedMethod = ".edu Email",
+                savingsEstimate = "Save $75.00",
+                urlHint = "amazon.com/joinstudent"
+            ),
+            com.example.data.model.StudentPerk(
+                id = "github_student",
+                company = "GitHub Education",
+                title = "GitHub Student Developer Pack",
+                discountSummary = "100% Free Tools, Copilot & Domains",
+                category = "Tech & Software",
+                verifiedMethod = "Student ID / .edu Email",
+                savingsEstimate = "Worth $2,000+",
+                urlHint = "education.github.com/pack"
+            ),
+            com.example.data.model.StudentPerk(
+                id = "apple_education",
+                company = "Apple",
+                title = "Apple Education Pricing + Gift Card",
+                discountSummary = "Up to $150 Gift Card + 10% Off Macs",
+                category = "Tech & Software",
+                verifiedMethod = "UNiDAYS Verification",
+                savingsEstimate = "Save $150+",
+                urlHint = "apple.com/us-edu/shop"
+            ),
+            com.example.data.model.StudentPerk(
+                id = "notion_student",
+                company = "Notion",
+                title = "Notion Plus Plan for Students",
+                discountSummary = "100% Free Personal Pro Workspace",
+                category = "Productivity & Notes",
+                verifiedMethod = ".edu Email",
+                savingsEstimate = "Save $96/year",
+                urlHint = "notion.so/students"
+            ),
+            com.example.data.model.StudentPerk(
+                id = "chegg_rentals",
+                company = "Chegg / CampusBooks",
+                title = "Used Textbooks & Textbook Rentals",
+                discountSummary = "Up to 85% Off List Prices",
+                category = "Course Materials",
+                verifiedMethod = "Instant Online",
+                savingsEstimate = "Save ~$250/semester",
+                urlHint = "chegg.com/books"
+            ),
+            com.example.data.model.StudentPerk(
+                id = "unidays_fashion",
+                company = "UNiDAYS & Nike/ASOS",
+                title = "15-20% Off Apparel & Footwear",
+                discountSummary = "15% off Nike, ASOS, Levi's & H&M",
+                category = "Retail & Lifestyle",
+                verifiedMethod = "UNiDAYS App",
+                savingsEstimate = "Save 15% on gear",
+                urlHint = "myunidays.com"
+            )
+        )
+    }
 }
+

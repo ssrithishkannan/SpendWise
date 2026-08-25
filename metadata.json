@@ -1,6 +1,6 @@
 {
   "name": "SpendWise",
-  "description": "Smart wealth and expense tracker with automated bank reconciliation, AI financial insights, streak habits, intelligent budget pacing, and multi-device cloud sync.",
+  "description": "Smart college student budget and expense tracker with semester pacing, meal plan swipe tracking, roommate Venmo bill splitting, verified student discounts, AI financial coaching, and automated bank reconciliation.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

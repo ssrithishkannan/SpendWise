@@ -41,7 +41,7 @@ class Converters {
         BankSyncAccountEntity::class,
         UserProfileEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

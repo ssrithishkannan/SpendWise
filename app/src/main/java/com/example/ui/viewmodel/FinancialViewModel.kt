@@ -78,10 +78,56 @@ class FinancialViewModel(application: Application) : AndroidViewModel(applicatio
     private val _showCelebration = MutableStateFlow(false)
     val showCelebration: StateFlow<Boolean> = _showCelebration.asStateFlow()
 
+    // College Student Perks and Roommate Splits
+    private val _studentPerks = MutableStateFlow<List<com.example.data.model.StudentPerk>>(emptyList())
+    val studentPerks: StateFlow<List<com.example.data.model.StudentPerk>> = _studentPerks.asStateFlow()
+
+    private val _claimedPerkIds = MutableStateFlow<Set<String>>(emptySet())
+    val claimedPerkIds: StateFlow<Set<String>> = _claimedPerkIds.asStateFlow()
+
+    fun togglePerkClaimed(perkId: String) {
+        val current = _claimedPerkIds.value
+        _claimedPerkIds.value = if (current.contains(perkId)) current - perkId else current + perkId
+    }
+
+    private val _roommateSplits = MutableStateFlow<List<com.example.data.model.RoommateSplitRecord>>(
+        listOf(
+            com.example.data.model.RoommateSplitRecord(
+                id = "split_1",
+                title = "Maple Dorm 4B High-Speed WiFi & Hulu",
+                totalBill = 84.00,
+                yourShare = 21.00,
+                roommateNames = listOf("Sam", "Alex", "Tyler", "Me"),
+                dateLogged = System.currentTimeMillis() - 86400000L * 2,
+                isSettled = true
+            ),
+            com.example.data.model.RoommateSplitRecord(
+                id = "split_2",
+                title = "Midterm Study Group Late-Night Pizza",
+                totalBill = 48.00,
+                yourShare = 16.00,
+                roommateNames = listOf("Alex", "Sam", "Me"),
+                dateLogged = System.currentTimeMillis() - 86400000L * 5,
+                isSettled = true
+            ),
+            com.example.data.model.RoommateSplitRecord(
+                id = "split_3",
+                title = "Weekend Costco Dorm Supplies & Paper Towels",
+                totalBill = 65.50,
+                yourShare = 32.75,
+                roommateNames = listOf("Tyler", "Me"),
+                dateLogged = System.currentTimeMillis() - 86400000L * 1,
+                isSettled = false
+            )
+        )
+    )
+    val roommateSplits: StateFlow<List<com.example.data.model.RoommateSplitRecord>> = _roommateSplits.asStateFlow()
+
     init {
         NotificationHelper.initNotificationChannels(application)
         val db = AppDatabase.getDatabase(application)
         repository = FinancialRepository(db.finPulseDao())
+        _studentPerks.value = repository.getStudentPerks()
 
         viewModelScope.launch {
             repository.seedInitialDataIfEmpty()
@@ -379,6 +425,114 @@ class FinancialViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch {
             val current = userProfile.value ?: UserProfileEntity()
             repository.updateUserProfile(current.copy(spendingAlertsEnabled = enabled))
+        }
+    }
+
+    fun addRoommateSplit(
+        title: String,
+        totalBill: Double,
+        roommates: List<String>,
+        logMyShareAsExpense: Boolean = true
+    ) {
+        addRoommateBillSplit(title, totalBill, roommates, logMyShareAsExpense)
+    }
+
+    fun findLocalMatchForBankFeed(bankTx: BankFeedTransaction): TransactionEntity? {
+        return allTransactions.value.find { local ->
+            !local.isReconciled &&
+            kotlin.math.abs(local.amount - bankTx.amount) < 0.01 &&
+            local.type == TransactionType.EXPENSE
+        }
+    }
+
+    fun reconcileBankFeedItem(bankTxId: String, localTxId: Long) {
+        val bankTx = bankFeed.value.find { it.id == bankTxId }
+        val ref = bankTx?.merchant ?: "Direct Bank Match"
+        reconcileTransaction(localTxId, bankTxId, ref)
+    }
+
+    fun importUnmatchedBankItem(bankTx: BankFeedTransaction) {
+        importBankFeedTransaction(bankTx)
+    }
+
+    fun addRoommateBillSplit(
+        title: String,
+        totalBill: Double,
+        roommates: List<String>,
+        logMyShareAsExpense: Boolean
+    ) {
+        val myShare = if (roommates.isNotEmpty()) totalBill / roommates.size else totalBill
+        val record = com.example.data.model.RoommateSplitRecord(
+            id = "split_${System.currentTimeMillis()}",
+            title = title,
+            totalBill = totalBill,
+            yourShare = myShare,
+            roommateNames = roommates,
+            dateLogged = System.currentTimeMillis(),
+            isSettled = false
+        )
+        _roommateSplits.value = listOf(record) + _roommateSplits.value
+
+        if (logMyShareAsExpense) {
+            addTransaction(
+                title = "$title (My Share)",
+                amount = myShare,
+                type = TransactionType.EXPENSE,
+                category = TransactionCategory.FOOD_DINING,
+                paymentMethod = PaymentMethod.VENMO,
+                note = "Split with ${roommates.filter { it.lowercase() != "me" }.joinToString(", ")}"
+            )
+        }
+    }
+
+    fun markRoommateSplitSettled(splitId: String) {
+        _roommateSplits.value = _roommateSplits.value.map {
+            if (it.id == splitId) it.copy(isSettled = !it.isSettled) else it
+        }
+    }
+
+    fun updateMealPlan(swipesRemaining: Int, flexDollars: Double) {
+        viewModelScope.launch {
+            val current = userProfile.value ?: UserProfileEntity()
+            repository.updateUserProfile(
+                current.copy(
+                    diningHallSwipesRemaining = swipesRemaining,
+                    flexDiningDollarsRemaining = flexDollars
+                )
+            )
+        }
+    }
+
+    fun useMealSwipe() {
+        viewModelScope.launch {
+            val current = userProfile.value ?: UserProfileEntity()
+            val remaining = (current.diningHallSwipesRemaining - 1).coerceAtLeast(0)
+            repository.updateUserProfile(current.copy(diningHallSwipesRemaining = remaining))
+        }
+    }
+
+    fun updateCollegeProfileInfo(
+        university: String,
+        major: String,
+        gradYear: String,
+        housing: String,
+        mealPlan: String,
+        semesterBudget: Double,
+        venmoHandle: String
+    ) {
+        viewModelScope.launch {
+            val current = userProfile.value ?: UserProfileEntity()
+            repository.updateUserProfile(
+                current.copy(
+                    universityName = university,
+                    studentMajor = major,
+                    graduationYear = gradYear,
+                    campusHousing = housing,
+                    diningMealPlan = mealPlan,
+                    semesterBudgetLimit = semesterBudget,
+                    venmoHandle = venmoHandle
+                )
+            )
         }
     }
 }
